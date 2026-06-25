@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Products — TechHub Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dim: #7A6030;
+    --obsidian: #0A0A0B;
+    --ink: #111113;
+    --surface: #161618;
+    --surface2: #1E1E21;
+    --muted: #6B6B72;
+    --text: #E8E6E0;
+    --text-dim: #9D9B94;
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--obsidian);
+    color: var(--text); font-family: var(--sans);
+    font-weight: 300; overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0; z-index: 1000; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    background-size: 180px 180px; opacity: 0.55;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 900;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 4vw; height: 72px;
+    background: rgba(10,10,11,0.92); backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(201,168,76,0.1);
+  }
+  .nav-logo { font-family: var(--serif); font-size: 1.6rem; font-weight: 400; letter-spacing: 0.35em; color: var(--gold); text-decoration: none; text-transform: uppercase; }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a { font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); text-decoration: none; transition: color 0.25s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--gold); }
+  .nav-actions { display: flex; align-items: center; gap: 1.25rem; }
+  .nav-icon { background: none; border: none; cursor: pointer; color: var(--text-dim); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; text-decoration: none; transition: color 0.25s; display: flex; align-items: center; gap: 0.5rem; }
+  .nav-icon:hover { color: var(--gold); }
+  .nav-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.2; }
+  .cart-count { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; border-radius: 50%; background: var(--gold); color: var(--obsidian); font-size: 0.6rem; font-weight: 500; font-family: var(--sans); }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    padding: 140px 5vw 5rem;
+    background: var(--ink);
+    border-bottom: 1px solid rgba(201,168,76,0.12);
+    position: relative; overflow: hidden;
+  }
+  .page-header::before {
+    content: 'COLLECTION';
+    position: absolute; bottom: -1rem; right: -2rem;
+    font-family: var(--serif); font-size: 10rem; font-weight: 300;
+    color: rgba(201,168,76,0.04); white-space: nowrap; pointer-events: none;
+    letter-spacing: 0.1em;
+  }
+  .header-breadcrumb {
+    font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase;
+    color: var(--gold-dim); margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 0.5rem;
+  }
+  .header-breadcrumb a { color: var(--gold-dim); text-decoration: none; transition: color 0.2s; }
+  .header-breadcrumb a:hover { color: var(--gold); }
+  .header-breadcrumb span { opacity: 0.4; }
+  .page-header h1 {
+    font-family: var(--serif); font-size: clamp(3rem, 5vw, 5.5rem);
+    font-weight: 300; line-height: 0.95; color: var(--text);
+  }
+  .page-header h1 em { font-style: italic; color: var(--gold); }
+  .page-header-sub { font-size: 0.82rem; color: var(--text-dim); line-height: 1.8; margin-top: 1.5rem; max-width: 50ch; }
+
+  /* ── LAYOUT ── */
+  .products-layout {
+    display: grid; grid-template-columns: 260px 1fr;
+    min-height: calc(100vh - 72px);
+    align-items: start;
+  }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    position: sticky; top: 72px;
+    background: var(--surface); padding: 2.5rem 2rem;
+    border-right: 1px solid rgba(201,168,76,0.08);
+    height: calc(100vh - 72px); overflow-y: auto;
+  }
+  .sidebar::-webkit-scrollbar { width: 3px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--gold-dim); }
+
+  .filter-group { margin-bottom: 2.5rem; }
+  .filter-group h3 {
+    font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--gold-dim); margin-bottom: 1.25rem; font-weight: 400;
+  }
+  .filter-sep { height: 1px; background: rgba(201,168,76,0.1); margin-bottom: 2.5rem; }
+
+  .filter-tag {
+    display: inline-flex; align-items: center;
+    padding: 0.4rem 0.9rem; margin: 0 0.4rem 0.5rem 0;
+    border: 1px solid rgba(201,168,76,0.2); cursor: pointer;
+    font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--text-dim); background: transparent;
+    font-family: var(--sans); transition: all 0.2s;
+  }
+  .filter-tag:hover { border-color: var(--gold); color: var(--gold); }
+  .filter-tag.active { background: var(--gold); color: var(--obsidian); border-color: var(--gold); }
+
+  .price-range { margin-top: 1rem; }
+  .price-labels { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-dim); margin-top: 0.5rem; }
+  input[type=range] {
+    -webkit-appearance: none; width: 100%; height: 2px;
+    background: rgba(201,168,76,0.2); outline: none; cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
+    background: var(--gold); cursor: pointer; border: 2px solid var(--obsidian);
+  }
+
+  .sort-select {
+    width: 100%; background: var(--surface2); border: 1px solid rgba(201,168,76,0.15);
+    color: var(--text); font-family: var(--sans); font-size: 0.75rem;
+    padding: 0.6rem 0.9rem; outline: none; cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 12 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237A6030' stroke-width='1.2' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 0.9rem center;
+    background-size: 10px;
+  }
+  .sort-select:focus { border-color: var(--gold); }
+
+  /* ── MAIN AREA ── */
+  .products-main { padding: 3rem 4vw 5rem; }
+
+  .products-toolbar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 3rem; padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(201,168,76,0.1);
+  }
+  .products-count { font-size: 0.75rem; color: var(--text-dim); }
+  .products-count strong { color: var(--gold); font-weight: 400; }
+  .toolbar-views { display: flex; gap: 0.5rem; }
+  .view-btn {
+    background: none; border: 1px solid rgba(201,168,76,0.15); padding: 0.4rem 0.5rem;
+    color: var(--muted); cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .view-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+  .view-btn.active, .view-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* ── PRODUCT GRID ── */
+  .grid-4 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px; }
+  .grid-1 { display: grid; grid-template-columns: 1fr; gap: 2px; }
+
+  .product-card {
+    position: relative; background: var(--surface); cursor: pointer;
+    text-decoration: none; color: inherit; overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .product-card:hover { transform: translateY(-3px); }
+  .product-card[data-hidden="true"] { display: none; }
+
+  .product-card__img-wrap { position: relative; aspect-ratio: 3/4; overflow: hidden; }
+  .product-card__img-wrap img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.4s;
+    filter: brightness(0.88) saturate(0.9);
+  }
+  .product-card:hover .product-card__img-wrap img { transform: scale(1.06); filter: brightness(0.72) saturate(0.85); }
+
+  .product-card__badges { position: absolute; top: 1rem; left: 1rem; display: flex; flex-direction: column; gap: 0.4rem; z-index: 2; }
+  .badge {
+    font-size: 0.58rem; letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 0.25rem 0.65rem; font-family: var(--sans);
+  }
+  .badge-new { border: 1px solid var(--gold); color: var(--gold); background: rgba(10,10,11,0.7); }
+  .badge-limited { border: 1px solid #fff; color: #fff; background: rgba(10,10,11,0.6); }
+  .badge-bestseller { background: var(--gold); color: var(--obsidian); border: none; }
+
+  .product-card__wish {
+    position: absolute; top: 1rem; right: 1rem; z-index: 2;
+    background: rgba(10,10,11,0.5); border: 1px solid rgba(255,255,255,0.1);
+    width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+    cursor: pointer; opacity: 0; transition: opacity 0.3s;
+    color: var(--text-dim); backdrop-filter: blur(4px);
+  }
+  .product-card__wish svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+  .product-card:hover .product-card__wish { opacity: 1; }
+  .product-card__wish.wishlisted { background: rgba(201,168,76,0.2); border-color: var(--gold); color: var(--gold); opacity: 1; }
+
+  .product-card__overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(0deg, rgba(10,10,11,0.85) 0%, transparent 55%);
+    display: flex; flex-direction: column; justify-content: flex-end; padding: 1.5rem;
+  }
+  .product-card__quick { opacity: 0; transform: translateY(8px); transition: opacity 0.3s, transform 0.3s; margin-bottom: 1rem; }
+  .product-card:hover .product-card__quick { opacity: 1; transform: translateY(0); }
+  .product-card__quick button {
+    width: 100%; padding: 0.75rem; background: var(--gold); color: var(--obsidian);
+    border: none; cursor: pointer; font-family: var(--sans);
+    font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500; transition: background 0.25s;
+  }
+  .product-card__quick button:hover { background: var(--gold-light); }
+
+  .product-card__info { padding: 1.25rem 1.25rem 1.5rem; }
+  .product-card__house { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-dim); margin-bottom: 0.4rem; }
+  .product-card__name { font-family: var(--serif); font-size: 1.15rem; font-weight: 400; color: var(--text); margin-bottom: 0.35rem; line-height: 1.2; }
+  .product-card__accord { font-size: 0.7rem; color: var(--muted); margin-bottom: 0.6rem; }
+  .product-card__price-row { display: flex; align-items: center; justify-content: space-between; }
+  .product-card__price { font-size: 0.85rem; color: var(--gold); letter-spacing: 0.05em; }
+
+  /* LIST VIEW */
+  .grid-1 .product-card { display: grid; grid-template-columns: 220px 1fr; }
+  .grid-1 .product-card__img-wrap { aspect-ratio: 2/3; }
+  .grid-1 .product-card__info { padding: 2rem 2.5rem; display: flex; flex-direction: column; justify-content: center; }
+  .grid-1 .product-card__name { font-size: 1.6rem; margin-bottom: 0.5rem; }
+  .grid-1 .product-card__accord { font-size: 0.78rem; margin-bottom: 1rem; max-width: 40ch; line-height: 1.6; }
+  .grid-1 .product-card__price { font-size: 1rem; }
+  .grid-1 .product-card__quick { opacity: 1; transform: none; margin-bottom: 0; }
+  .grid-1 .product-card__quick button { width: auto; padding: 0.75rem 2rem; }
+  .grid-1 .product-card__overlay { display: none; }
+  .grid-1 .product-card__price-row { margin-top: 1.5rem; align-items: flex-start; gap: 1rem; flex-wrap: wrap; }
+
+  /* ── PRODUCT DETAIL MODAL ── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 2000;
+    background: rgba(10,10,11,0.92); backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 2rem; opacity: 0; pointer-events: none;
+    transition: opacity 0.35s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--surface); max-width: 900px; width: 100%;
+    display: grid; grid-template-columns: 1fr 1fr;
+    transform: translateY(20px); transition: transform 0.35s;
+    max-height: 90vh; overflow: hidden;
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal__img { aspect-ratio: 3/4; object-fit: cover; width: 100%; height: 100%; filter: brightness(0.85) saturate(0.9); }
+  .modal__body { padding: 3rem 2.5rem; overflow-y: auto; }
+  .modal__body::-webkit-scrollbar { width: 3px; }
+  .modal__body::-webkit-scrollbar-thumb { background: var(--gold-dim); }
+  .modal__house { font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.75rem; }
+  .modal__name { font-family: var(--serif); font-size: 2.5rem; font-weight: 300; line-height: 1.05; margin-bottom: 0.5rem; }
+  .modal__accord { font-size: 0.78rem; color: var(--muted); margin-bottom: 1.5rem; }
+  .modal__price { font-family: var(--serif); font-size: 1.8rem; font-weight: 300; color: var(--gold); margin-bottom: 2rem; }
+  .modal__desc { font-size: 0.82rem; color: var(--text-dim); line-height: 1.9; margin-bottom: 2rem; }
+  .modal__notes h4 { font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold-dim); margin-bottom: 0.75rem; font-weight: 400; }
+  .modal__notes-row { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.5rem; }
+  .note-tag { font-size: 0.68rem; padding: 0.3rem 0.75rem; border: 1px solid rgba(201,168,76,0.2); color: var(--text-dim); }
+  .modal__sizes { display: flex; gap: 0.5rem; margin-bottom: 2rem; }
+  .size-btn {
+    flex: 1; padding: 0.6rem; border: 1px solid rgba(201,168,76,0.2);
+    background: transparent; color: var(--text-dim); cursor: pointer;
+    font-family: var(--sans); font-size: 0.72rem; transition: all 0.2s;
+  }
+  .size-btn.active { border-color: var(--gold); color: var(--gold); }
+  .size-btn:hover { border-color: var(--gold); }
+  .modal__add { width: 100%; padding: 1rem; background: var(--gold); color: var(--obsidian); border: none; cursor: pointer; font-family: var(--sans); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; font-weight: 500; transition: background 0.25s; margin-bottom: 0.75rem; }
+  .modal__add:hover { background: var(--gold-light); }
+  .modal__close {
+    position: absolute; top: 1rem; right: 1rem; z-index: 1;
+    background: none; border: 1px solid rgba(255,255,255,0.1); width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-dim);
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .modal__close:hover { color: var(--text); border-color: rgba(255,255,255,0.3); }
+  .modal__close svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 1.5; }
+
+  /* ── FADE UP ── */
+  .fade-up { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1100px) {
+    .products-layout { grid-template-columns: 220px 1fr; }
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .products-layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; height: auto; }
+    nav { padding: 0 5vw; }
+    .nav-links { display: none; }
+    .grid-1 .product-card { grid-template-columns: 140px 1fr; }
+    .modal { grid-template-columns: 1fr; }
+    .modal__img { max-height: 40vh; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Vite Module Entry Point -->
+<script type="module" src="/src/main.js"></script>
+
+<!-- ── NAVIGATION ── -->
+<nav>
+  <a href="index.html" class="nav-logo">TechHub</a>
+  <ul class="nav-links">
+    <li><a href="products.html" class="active">Collection</a></li>
+    <li><a href="index.html#about">Heritage</a></li>
+    <li><a href="index.html#ingredients">Ingredients</a></li>
+    <li><a href="index.html#editorial">Journal</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="#" class="nav-icon" aria-label="Search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+    </a>
+    <a href="cart.html" class="nav-icon" aria-label="Cart">
+      <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      <span class="cart-count" id="cart-count">0</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ── PAGE HEADER ── -->
+<div class="page-header">
+  <div class="header-breadcrumb">
+    <a href="index.html">Home</a>
+    <span>/</span>
+    <span>Collection</span>
+  </div>
+  <h1>All <em>Products</em></h1>
+  <p class="page-header-sub">Browse our complete collection of 120+ electronics and gadgets.</p>
+</div>
+
+<!-- ── PRODUCTS LAYOUT ── -->
+<div class="products-layout">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="filter-group">
+      <h3>Sort By</h3>
+      <select class="sort-select" id="sort-select">
+        <option value="featured">Featured</option>
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+        <option value="newest">Newest First</option>
+      </select>
+    </div>
+
+    <div class="filter-sep"></div>
+
+    <div class="filter-group">
+      <h3>Category</h3>
+      <button class="filter-tag active" data-filter="category" data-value="all">All</button>
+      <button class="filter-tag" data-filter="category" data-value="collection">Collection</button>
+      <button class="filter-tag" data-filter="category" data-value="rarity">Rarity Series</button>
+      <button class="filter-tag" data-filter="category" data-value="gift">Gift Sets</button>
+    </div>
+
+    <div class="filter-group">
+      <h3>Accord</h3>
+      <button class="filter-tag" data-filter="accord" data-value="woody">Woody</button>
+      <button class="filter-tag" data-filter="accord" data-value="floral">Floral</button>
+      <button class="filter-tag" data-filter="accord" data-value="oriental">Oriental</button>
+      <button class="filter-tag" data-filter="accord" data-value="fresh">Fresh</button>
+      <button class="filter-tag" data-filter="accord" data-value="gourmand">Gourmand</button>
+    </div>
+
+    <div class="filter-group">
+      <h3>Price Range</h3>
+      <div class="price-range">
+        <input type="range" min="200" max="900" value="900" id="price-slider">
+        <div class="price-labels"><span>$200</span><span id="price-max">$900</span></div>
+      </div>
+    </div>
+
+    <div class="filter-sep"></div>
+
+    <div class="filter-group">
+      <h3>Availability</h3>
+      <button class="filter-tag" data-filter="availability" data-value="instock">In Stock</button>
+      <button class="filter-tag" data-filter="availability" data-value="new">New Arrival</button>
+      <button class="filter-tag" data-filter="availability" data-value="limited">Limited Edition</button>
+    </div>
+  </aside>
+
+  <!-- Main Products -->
+  <main class="products-main">
+
+    <div class="products-toolbar">
+      <p class="products-count"><strong id="visible-count">8</strong> fragrances</p>
+      <div class="toolbar-views">
+        <button class="view-btn active" id="view-3" aria-label="3-column grid" onclick="setView(3)">
+          <svg viewBox="0 0 14 14"><rect x="0" y="0" width="4" height="4"/><rect x="5" y="0" width="4" height="4"/><rect x="10" y="0" width="4" height="4"/><rect x="0" y="5" width="4" height="4"/><rect x="5" y="5" width="4" height="4"/><rect x="10" y="5" width="4" height="4"/></svg>
+        </button>
+        <button class="view-btn" id="view-2" aria-label="2-column grid" onclick="setView(2)">
+          <svg viewBox="0 0 14 14"><rect x="0" y="0" width="6" height="6"/><rect x="8" y="0" width="6" height="6"/><rect x="0" y="8" width="6" height="6"/><rect x="8" y="8" width="6" height="6"/></svg>
+        </button>
+        <button class="view-btn" id="view-1" aria-label="List view" onclick="setView(1)">
+          <svg viewBox="0 0 14 14"><rect x="0" y="1" width="14" height="2"/><rect x="0" y="6" width="14" height="2"/><rect x="0" y="11" width="14" height="2"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="grid-4" id="product-grid">
+      
+      <!-- Product 1: Wireless Earbuds -->
+      <div class="product-card" data-price="49" data-category="electronics" data-accord="audio">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=600&q=80" alt="Wireless Earbuds">
+          <div class="product-card__badges"><span class="badge badge-bestseller">Bestseller</span></div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">Wireless Earbuds</div>
+          <div class="product-card__accord">Audio · Wireless · ANC</div>
+          <div class="product-card__price">$49</div>
+        </div>
+      </div>
+
+      <!-- Product 2: Bluetooth Speakers -->
+      <div class="product-card" data-price="79" data-category="electronics" data-accord="audio">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=600&q=80" alt="Bluetooth Speakers">
+          <div class="product-card__badges"><span class="badge badge-new">New</span></div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">Bluetooth Speakers</div>
+          <div class="product-card__accord">Audio · Portable · Waterproof</div>
+          <div class="product-card__price">$79</div>
+        </div>
+      </div>
+
+      <!-- Product 3: Smart Watches -->
+      <div class="product-card" data-price="199" data-category="electronics" data-accord="wearable">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1579586337278-3befd40fd17a?w=600&q=80" alt="Smart Watches">
+          <div class="product-card__badges"><span class="badge badge-bestseller">Bestseller</span></div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">Smart Watches</div>
+          <div class="product-card__accord">Wearable · Fitness · Smart</div>
+          <div class="product-card__price">$199</div>
+        </div>
+      </div>
+
+      <!-- Product 4: Fitness Bands -->
+      <div class="product-card" data-price="39" data-category="electronics" data-accord="wearable">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=600&q=80" alt="Fitness Bands">
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">Fitness Bands</div>
+          <div class="product-card__accord">Wearable · Fitness · Tracking</div>
+          <div class="product-card__price">$39</div>
+        </div>
+      </div>
+
+      <!-- Product 5: Power Banks -->
+      <div class="product-card" data-price="35" data-category="electronics" data-accord="charging">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=600&q=80" alt="Power Banks">
+          <div class="product-card__badges"><span class="badge badge-bestseller">Bestseller</span></div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">Power Banks</div>
+          <div class="product-card__accord">Charging · Portable · Fast</div>
+          <div class="product-card__price">$35</div>
+        </div>
+      </div>
+
+      <!-- Product 6: Mobile Chargers -->
+      <div class="product-card" data-price="25" data-category="electronics" data-accord="charging">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=600&q=80" alt="Mobile Chargers">
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">Mobile Chargers</div>
+          <div class="product-card__accord">Charging · Fast · Multi-port</div>
+          <div class="product-card__price">$25</div>
+        </div>
+      </div>
+
+      <!-- Product 7: USB-C Cables -->
+      <div class="product-card" data-price="15" data-category="electronics" data-accord="accessories">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1625948515291-69613efd103f?w=600&q=80" alt="USB-C Cables">
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">USB-C Cables</div>
+          <div class="product-card__accord">Accessories · Cable · Fast Data</div>
+          <div class="product-card__price">$15</div>
+        </div>
+      </div>
+
+      <!-- Product 8: Laptop Stands -->
+      <div class="product-card" data-price="45" data-category="electronics" data-accord="accessories">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=600&q=80" alt="Laptop Stands">
+          <div class="product-card__badges"><span class="badge badge-new">New</span></div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">Laptop Stands</div>
+          <div class="product-card__accord">Accessories · Ergonomic · Aluminum</div>
+          <div class="product-card__price">$45</div>
+        </div>
+      </div>
+
+      <!-- Product 9: Wireless Mouse -->
+      <div class="product-card" data-price="29" data-category="electronics" data-accord="peripherals">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1527814050087-3793815479db?w=600&q=80" alt="Wireless Mouse">
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">Wireless Mouse</div>
+          <div class="product-card__accord">Peripherals · Wireless · Ergonomic</div>
+          <div class="product-card__price">$29</div>
+        </div>
+      </div>
+
+      <!-- Product 10: Mechanical Keyboard -->
+      <div class="product-card" data-price="89" data-category="electronics" data-accord="peripherals">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&q=80" alt="Mechanical Keyboard">
+          <div class="product-card__badges"><span class="badge badge-bestseller">Bestseller</span></div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">Mechanical Keyboard</div>
+          <div class="product-card__accord">Peripherals · Mechanical · RGB</div>
+          <div class="product-card__price">$89</div>
+        </div>
+      </div>
+
+      <!-- Product 11: Webcam -->
+      <div class="product-card" data-price="69" data-category="electronics" data-accord="peripherals">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=600&q=80" alt="Webcam">
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">Webcam</div>
+          <div class="product-card__accord">Peripherals · HD · Autofocus</div>
+          <div class="product-card__price">$69</div>
+        </div>
+      </div>
+
+      <!-- Product 12: Portable SSD -->
+      <div class="product-card" data-price="119" data-category="electronics" data-accord="storage">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=600&q=80" alt="Portable SSD">
+          <div class="product-card__badges"><span class="badge badge-new">New</span></div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">Portable SSD</div>
+          <div class="product-card__accord">Storage · Fast · Portable</div>
+          <div class="product-card__price">$119</div>
+        </div>
+      </div>
+
+      <!-- Product 13: External Hard Drive -->
+      <div class="product-card" data-price="79" data-category="electronics" data-accord="storage">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1531492746076-161ca9bcad58?w=600&q=80" alt="External Hard Drive">
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">External Hard Drive</div>
+          <div class="product-card__accord">Storage · Large Capacity · Backup</div>
+          <div class="product-card__price">$79</div>
+        </div>
+      </div>
+
+      <!-- Product 14: Smart Bulbs -->
+      <div class="product-card" data-price="19" data-category="electronics" data-accord="smart-home">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&q=80" alt="Smart Bulbs">
+          <div class="product-card__badges"><span class="badge badge-bestseller">Bestseller</span></div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">Smart Bulbs</div>
+          <div class="product-card__accord">Smart Home · RGB · Voice Control</div>
+          <div class="product-card__price">$19</div>
+        </div>
+      </div>
+
+      <!-- Product 15: Wi-Fi Extenders -->
+      <div class="product-card" data-price="49" data-category="electronics" data-accord="networking">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1606904825846-647eb07f5be2?w=600&q=80" alt="Wi-Fi Extenders">
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">Wi-Fi Extenders</div>
+          <div class="product-card__accord">Networking · Range Boost · Dual Band</div>
+          <div class="product-card__price">$49</div>
+        </div>
+      </div>
+
+      <!-- Product 16: Streaming Devices -->
+      <div class="product-card" data-price="39" data-category="electronics" data-accord="entertainment">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600&q=80" alt="Streaming Devices">
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">Streaming Devices</div>
+          <div class="product-card__accord">Entertainment · 4K · Streaming</div>
+          <div class="product-card__price">$39</div>
+        </div>
+      </div>
+
+      <!-- Product 17: Phone Tripods -->
+      <div class="product-card" data-price="24" data-category="electronics" data-accord="photography">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1606166325683-7e16c864f4b3?w=600&q=80" alt="Phone Tripods">
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">Phone Tripods</div>
+          <div class="product-card__accord">Photography · Flexible · Remote</div>
+          <div class="product-card__price">$24</div>
+        </div>
+      </div>
+
+      <!-- Product 18: Ring Lights -->
+      <div class="product-card" data-price="45" data-category="electronics" data-accord="photography">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1618438440364-3b0e3f1222dc?w=600&q=80" alt="Ring Lights">
+          <div class="product-card__badges"><span class="badge badge-new">New</span></div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">Ring Lights</div>
+          <div class="product-card__accord">Photography · LED · Adjustable</div>
+          <div class="product-card__price">$45</div>
+        </div>
+      </div>
+
+      <!-- Product 19: Action Cameras -->
+      <div class="product-card" data-price="149" data-category="electronics" data-accord="photography">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?w=600&q=80" alt="Action Cameras">
+          <div class="product-card__badges"><span class="badge badge-limited">Limited</span></div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">Action Cameras</div>
+          <div class="product-card__accord">Photography · 4K · Waterproof</div>
+          <div class="product-card__price">$149</div>
+        </div>
+      </div>
+
+      <!-- Product 20: Noise Cancelling Headphones -->
+      <div class="product-card" data-price="159" data-category="electronics" data-accord="audio">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=600&q=80" alt="Noise Cancelling Headphones">
+          <div class="product-card__badges"><span class="badge badge-bestseller">Bestseller</span></div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Electronics & Gadgets</div>
+          <div class="product-card__name">Noise Cancelling Headphones</div>
+          <div class="product-card__accord">Audio · ANC · Long Battery</div>
+          <div class="product-card__price">$159</div>
+        </div>
+      </div>
+      
+    </div>
+    
+    <!-- Load more button removed - all products displayed -->
+  </main>
+</div>
+
+<!-- REMAINDER OF PRODUCTS KEPT FOR REFERENCE -->
+<div style="display:none;">
+      <div class="product-card fade-up" data-price="380" data-category="collection" data-accord="woody" data-new="true" data-id="1" onclick="openModal(1)">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1590156206657-aec9ac26a2f1?w=500&q=80&auto=format" alt="Noir Absolu" loading="lazy">
+          <div class="product-card__badges"><span class="badge badge-new">New</span></div>
+          <button class="product-card__wish" aria-label="Wishlist" onclick="event.stopPropagation(); toggleWish(this)">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          </button>
+          <div class="product-card__overlay">
+            <div class="product-card__quick">
+              <button onclick="event.stopPropagation(); addToCart('Noir Absolu', 380)">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Aurum Collection</div>
+          <div class="product-card__name">Noir Absolu</div>
+          <div class="product-card__accord">Oud · Leather · Vetiver</div>
+          <div class="product-card__price-row">
+            <span class="product-card__price">$380</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product 2 -->
+      <div class="product-card fade-up" style="transition-delay:0.08s" data-price="460" data-category="collection" data-accord="floral" data-id="2" onclick="openModal(2)">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1541643600914-78b084683702?w=500&q=80&auto=format" alt="Rose Profond" loading="lazy">
+          <div class="product-card__badges"><span class="badge badge-bestseller">Bestseller</span></div>
+          <button class="product-card__wish" aria-label="Wishlist" onclick="event.stopPropagation(); toggleWish(this)">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          </button>
+          <div class="product-card__overlay">
+            <div class="product-card__quick">
+              <button onclick="event.stopPropagation(); addToCart('Rose Profond', 460)">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Aurum Collection</div>
+          <div class="product-card__name">Rose Profond</div>
+          <div class="product-card__accord">Rose · Oud · Musks</div>
+          <div class="product-card__price-row"><span class="product-card__price">$460</span></div>
+        </div>
+      </div>
+
+      <!-- Product 3 -->
+      <div class="product-card fade-up" style="transition-delay:0.16s" data-price="620" data-category="rarity" data-accord="oriental" data-limited="true" data-id="3" onclick="openModal(3)">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=500&q=80&auto=format" alt="Oud Imperial" loading="lazy">
+          <div class="product-card__badges"><span class="badge badge-limited">Limited</span></div>
+          <button class="product-card__wish" aria-label="Wishlist" onclick="event.stopPropagation(); toggleWish(this)">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          </button>
+          <div class="product-card__overlay">
+            <div class="product-card__quick">
+              <button onclick="event.stopPropagation(); addToCart('Oud Imperial', 620)">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Rarity Series</div>
+          <div class="product-card__name">Oud Imperial</div>
+          <div class="product-card__accord">Cambodian Oud · Saffron · Amber</div>
+          <div class="product-card__price-row"><span class="product-card__price">$620</span></div>
+        </div>
+      </div>
+
+      <!-- Product 4 -->
+      <div class="product-card fade-up" style="transition-delay:0.24s" data-price="340" data-category="collection" data-accord="woody" data-id="4" onclick="openModal(4)">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&q=80&auto=format" alt="Vetiver Sacré" loading="lazy">
+          <button class="product-card__wish" aria-label="Wishlist" onclick="event.stopPropagation(); toggleWish(this)">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          </button>
+          <div class="product-card__overlay">
+            <div class="product-card__quick">
+              <button onclick="event.stopPropagation(); addToCart('Vetiver Sacré', 340)">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Aurum Collection</div>
+          <div class="product-card__name">Vetiver Sacré</div>
+          <div class="product-card__accord">Vetiver · Cedar · Incense</div>
+          <div class="product-card__price-row"><span class="product-card__price">$340</span></div>
+        </div>
+      </div>
+
+      <!-- Product 5 -->
+      <div class="product-card fade-up" style="transition-delay:0.08s" data-price="520" data-category="rarity" data-accord="floral" data-limited="true" data-id="5" onclick="openModal(5)">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1581985673473-0784a7a44e39?w=500&q=80&auto=format" alt="Iris Céleste" loading="lazy">
+          <div class="product-card__badges"><span class="badge badge-limited">Limited</span></div>
+          <button class="product-card__wish" aria-label="Wishlist" onclick="event.stopPropagation(); toggleWish(this)">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          </button>
+          <div class="product-card__overlay">
+            <div class="product-card__quick">
+              <button onclick="event.stopPropagation(); addToCart('Iris Céleste', 520)">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Rarity Series</div>
+          <div class="product-card__name">Iris Céleste</div>
+          <div class="product-card__accord">Orris Butter · Violet · Musk</div>
+          <div class="product-card__price-row"><span class="product-card__price">$520</span></div>
+        </div>
+      </div>
+
+      <!-- Product 6 -->
+      <div class="product-card fade-up" style="transition-delay:0.16s" data-price="290" data-category="collection" data-accord="fresh" data-id="6" onclick="openModal(6)">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=500&q=80&auto=format" alt="Aqua Profunda" loading="lazy">
+          <div class="product-card__badges"><span class="badge badge-new">New</span></div>
+          <button class="product-card__wish" aria-label="Wishlist" onclick="event.stopPropagation(); toggleWish(this)">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          </button>
+          <div class="product-card__overlay">
+            <div class="product-card__quick">
+              <button onclick="event.stopPropagation(); addToCart('Aqua Profunda', 290)">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Aurum Collection</div>
+          <div class="product-card__name">Aqua Profunda</div>
+          <div class="product-card__accord">Sea Salt · Bergamot · Ambergris</div>
+          <div class="product-card__price-row"><span class="product-card__price">$290</span></div>
+        </div>
+      </div>
+
+      <!-- Product 7 -->
+      <div class="product-card fade-up" style="transition-delay:0.24s" data-price="780" data-category="rarity" data-accord="oriental" data-limited="true" data-id="7" onclick="openModal(7)">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1616604426203-b836bf4bc7e5?w=500&q=80&auto=format" alt="Ambre Nuit" loading="lazy">
+          <div class="product-card__badges"><span class="badge badge-limited">Limited</span></div>
+          <button class="product-card__wish" aria-label="Wishlist" onclick="event.stopPropagation(); toggleWish(this)">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          </button>
+          <div class="product-card__overlay">
+            <div class="product-card__quick">
+              <button onclick="event.stopPropagation(); addToCart('Ambre Nuit', 780)">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Rarity Series</div>
+          <div class="product-card__name">Ambre Nuit</div>
+          <div class="product-card__accord">Labdanum · Benzoin · Vanilla</div>
+          <div class="product-card__price-row"><span class="product-card__price">$780</span></div>
+        </div>
+      </div>
+
+      <!-- Product 8 -->
+      <div class="product-card fade-up" style="transition-delay:0.32s" data-price="410" data-category="collection" data-accord="gourmand" data-id="8" onclick="openModal(8)">
+        <div class="product-card__img-wrap">
+          <img src="https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=500&q=80&auto=format" alt="Tabac Doré" loading="lazy">
+          <button class="product-card__wish" aria-label="Wishlist" onclick="event.stopPropagation(); toggleWish(this)">
+            <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          </button>
+          <div class="product-card__overlay">
+            <div class="product-card__quick">
+              <button onclick="event.stopPropagation(); addToCart('Tabac Doré', 410)">Add to Cart</button>
+            </div>
+          </div>
+        </div>
+        <div class="product-card__info">
+          <div class="product-card__house">Aurum Collection</div>
+          <div class="product-card__name">Tabac Doré</div>
+          <div class="product-card__accord">Tobacco · Honey · Sandalwood</div>
+          <div class="product-card__price-row"><span class="product-card__price">$410</span></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ── MODAL ── -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" style="position:relative">
+    <button class="modal__close" onclick="closeModal(null, true)" aria-label="Close">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+    <img id="modal-img" class="modal__img" src="" alt="">
+    <div class="modal__body">
+      <div class="modal__house" id="modal-house"></div>
+      <div class="modal__name" id="modal-name"></div>
+      <div class="modal__accord" id="modal-accord"></div>
+      <div class="modal__price" id="modal-price"></div>
+      <div class="modal__desc" id="modal-desc"></div>
+      <div class="modal__notes">
+        <h4>Top Notes</h4>
+        <div class="modal__notes-row" id="modal-notes-top"></div>
+        <h4>Heart Notes</h4>
+        <div class="modal__notes-row" id="modal-notes-heart"></div>
+        <h4>Base Notes</h4>
+        <div class="modal__notes-row" id="modal-notes-base"></div>
+      </div>
+      <div class="modal__sizes" id="modal-sizes"></div>
+      <button class="modal__add" id="modal-add-btn">Add to Cart</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const products = {
+  1: { house:'Aurum Collection', name:'Noir Absolu', accord:'Oud · Leather · Vetiver', price:380, img:'https://images.unsplash.com/photo-1590156206657-aec9ac26a2f1?w=800&q=80&auto=format', desc:'An evening fragrance of uncommon gravity. Noir Absolu opens with a flash of crushed black pepper before settling into a core of aged leathery oud, sustained by a vetiver base that feels carved from stone.', top:['Black Pepper','Bergamot','Cardamom'], heart:['Leather','Oud','Violet'], base:['Vetiver','Patchouli','Musks'] },
+  2: { house:'Aurum Collection', name:'Rose Profond', accord:'Rose · Oud · Musks', price:460, img:'https://images.unsplash.com/photo-1541643600914-78b084683702?w=800&q=80&auto=format', desc:'The rose at the centre of Profond is sourced from a single estate in Grasse. It is not sweet — it is the rose at 3am, tired and magnificent, its petals against warm skin.', top:['Litchi','Green Leaves','Pepper'], heart:['Damascene Rose','Geranium','Oud'], base:['Patchouli','Sandalwood','White Musks'] },
+  3: { house:'Rarity Series', name:'Oud Imperial', accord:'Cambodian Oud · Saffron · Amber', price:620, img:'https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=800&q=80&auto=format', desc:'Made with oud oil sourced from the Mekong delta and aged for twelve years. The rarest and most complex fragrance in the Aurum range. Production is limited to 1,000 bottles per year.', top:['Saffron','Cinnamon','Pink Pepper'], heart:['Cambodian Oud','Rose Absolute','Incense'], base:['Amber','Labdanum','Dark Musks'] },
+  4: { house:'Aurum Collection', name:'Vetiver Sacré', accord:'Vetiver · Cedar · Incense', price:340, img:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80&auto=format', desc:'Vetiver Sacré is built around Haitian vetiver of exceptional quality — earthy, smoky, with a rumble of cedarwood and a thread of temple incense running through the dry-down.', top:['Bergamot','Grapefruit','Vetiver Heart'], heart:['Cedar','Vetiver Absolute','Cashmeran'], base:['Incense','Sandalwood','Amber'] },
+  5: { house:'Rarity Series', name:'Iris Céleste', accord:'Orris Butter · Violet · Musk', price:520, img:'https://images.unsplash.com/photo-1581985673473-0784a7a44e39?w=800&q=80&auto=format', desc:'Iris Céleste uses orris butter aged for three years in the open air — the most labour-intensive process in perfumery. The result is a powdery, celestial fragrance of unreachable beauty.', top:['Mandarin','Aldehydes','Iris Stem'], heart:['Orris Butter','Violet','Jasmine'], base:['Vetiver','Musks','Cedar'] },
+  6: { house:'Aurum Collection', name:'Aqua Profunda', accord:'Sea Salt · Bergamot · Ambergris', price:290, img:'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=800&q=80&auto=format', desc:'Not an aquatic cliché but a genuinely maritime fragrance — the smell of real ocean depth, mineral and ancient, with a sun-warmed driftwood base that keeps it from disappearing.', top:['Bergamot','Sea Salt','Calone'], heart:['Ambergris','Marine Notes','Neroli'], base:['Driftwood','Musk','Orris'] },
+  7: { house:'Rarity Series', name:'Ambre Nuit', accord:'Labdanum · Benzoin · Vanilla', price:780, img:'https://images.unsplash.com/photo-1616604426203-b836bf4bc7e5?w=800&q=80&auto=format', desc:'The warmest fragrance Aurum has ever made. Ambre Nuit is built around a resinous heart of labdanum absolute and benzoin, tempered by a trace of vetiver to keep it from becoming sweet.', top:['Bergamot','Aldehydes','Pink Pepper'], heart:['Labdanum','Benzoin','Rose Absolute'], base:['Vanilla','Vetiver','Dark Amber','Musks'] },
+  8: { house:'Aurum Collection', name:'Tabac Doré', accord:'Tobacco · Honey · Sandalwood', price:410, img:'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=800&q=80&auto=format', desc:'A golden, contemplative fragrance inspired by the ritual of a lit pipe in a library at dusk. Raw tobacco leaf, warm honey, and Mysore sandalwood in perfect equilibrium.', top:['Rum Accord','Tobacco Leaf','Cardamom'], heart:['Honey','Beeswax','Cedar'], base:['Sandalwood','Benzoin','Vanilla Absolute'] }
+};
+const sizes = ['30 ml', '50 ml', '100 ml'];
+
+function openModal(id) {
+  const p = products[id];
+  if (!p) return;
+  document.getElementById('modal-img').src = p.img;
+  document.getElementById('modal-house').textContent = p.house;
+  document.getElementById('modal-name').textContent = p.name;
+  document.getElementById('modal-accord').textContent = p.accord;
+  document.getElementById('modal-price').textContent = '$' + p.price;
+  document.getElementById('modal-desc').textContent = p.desc;
+  const mkNotes = (el, arr) => { el.innerHTML = arr.map(n => `<span class="note-tag">${n}</span>`).join(''); };
+  mkNotes(document.getElementById('modal-notes-top'), p.top);
+  mkNotes(document.getElementById('modal-notes-heart'), p.heart);
+  mkNotes(document.getElementById('modal-notes-base'), p.base);
+  const sizesEl = document.getElementById('modal-sizes');
+  sizesEl.innerHTML = sizes.map((s,i) => `<button class="size-btn${i===1?' active':''}" onclick="selectSize(this)">${s}</button>`).join('');
+  document.getElementById('modal-add-btn').onclick = () => { addToCart(p.name, p.price); closeModal(null, true); };
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(e, force) {
+  if (force || (e && e.target === document.getElementById('modal-overlay'))) {
+    document.getElementById('modal-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+}
+function selectSize(btn) {
+  btn.closest('.modal__sizes').querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+window.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(null, true); });
+
+function setView(n) {
+  const grid = document.getElementById('product-grid');
+  grid.className = n === 1 ? 'grid-1' : n === 2 ? 'grid-2' : 'grid-4';
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + n).classList.add('active');
+}
+
+// Filtering
+let activeFilters = { category: 'all', accord: null, availability: null };
+let priceMax = 900;
+
+document.querySelectorAll('.filter-tag').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const type = btn.dataset.filter;
+    const val = btn.dataset.value;
+    if (activeFilters[type] === val) {
+      activeFilters[type] = type === 'category' ? 'all' : null;
+      if (type === 'category') {
+        document.querySelector('[data-filter="category"][data-value="all"]').classList.add('active');
+        btn.classList.remove('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    } else {
+      document.querySelectorAll(`[data-filter="${type}"]`).forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeFilters[type] = val;
+    }
+    applyFilters();
+  });
+});
+
+document.getElementById('price-slider').addEventListener('input', function() {
+  priceMax = parseInt(this.value);
+  document.getElementById('price-max').textContent = '$' + priceMax;
+  applyFilters();
+});
+
+function applyFilters() {
+  const cards = document.querySelectorAll('.product-card');
+  let visible = 0;
+  cards.forEach(card => {
+    const price = parseInt(card.dataset.price);
+    const cat = card.dataset.category;
+    const acc = card.dataset.accord;
+    const isNew = card.dataset.new;
+    const isLimited = card.dataset.limited;
+    let show = true;
+    if (activeFilters.category && activeFilters.category !== 'all' && cat !== activeFilters.category) show = false;
+    if (activeFilters.accord && acc !== activeFilters.accord) show = false;
+    if (activeFilters.availability === 'new' && !isNew) show = false;
+    if (activeFilters.availability === 'limited' && !isLimited) show = false;
+    if (price > priceMax) show = false;
+    card.dataset.hidden = !show;
+    card.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  document.getElementById('visible-count').textContent = visible;
+}
+
+function toggleWish(btn) {
+  btn.classList.toggle('wishlisted');
+}
+
+// Cart
+function getCart() { try { return JSON.parse(localStorage.getItem('aurum_cart') || '[]'); } catch { return []; } }
+function saveCart(c) { localStorage.setItem('aurum_cart', JSON.stringify(c)); }
+function updateCartCount() {
+  const total = getCart().reduce((s, i) => s + i.qty, 0);
+  document.getElementById('cart-count').textContent = total;
+}
+function addToCart(name, price) {
+  const cart = getCart();
+  const idx = cart.findIndex(i => i.name === name);
+  if (idx > -1) cart[idx].qty++; else cart.push({ name, price, qty: 1 });
+  saveCart(cart); updateCartCount(); showToast(name + ' added to cart');
+}
+function showToast(msg) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  Object.assign(t.style, { position:'fixed', bottom:'2rem', right:'2rem', zIndex:'9999', background:'#C9A84C', color:'#0A0A0B', padding:'0.75rem 1.5rem', fontFamily:"'DM Sans',sans-serif", fontSize:'0.75rem', letterSpacing:'0.1em', opacity:'0', transition:'opacity 0.3s' });
+  document.body.appendChild(t);
+  requestAnimationFrame(() => t.style.opacity = '1');
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2500);
+}
+
+updateCartCount();
+
+// Dynamic Product Loading
+let displayedCount = 24;
+const productsPerLoad = 24;
+
+function renderProducts() {
+  const grid = document.getElementById('product-grid');
+  const fragment = document.createDocumentFragment();
+  
+  for (let i = 0; i < Math.min(displayedCount, PRODUCTS.length); i++) {
+    const p = PRODUCTS[i];
+    const card = document.createElement('div');
+    card.className = 'product-card fade-up';
+    card.dataset.price = p.price;
+    card.dataset.category = p.category;
+    card.dataset.accord = p.accord;
+    if (p.new) card.dataset.new = 'true';
+    if (p.limited) card.dataset.limited = 'true';
+    card.dataset.id = p.id;
+    card.onclick = () => openModal(p.id);
+    
+    let badgeHTML = '';
+    if (p.badges && p.badges.length > 0) {
+      badgeHTML = '<div class="product-card__badges">';
+      p.badges.forEach(b => {
+        if (b === 'new') badgeHTML += '<span class="badge badge-new">New</span>';
+        else if (b === 'limited') badgeHTML += '<span class="badge badge-limited">Limited</span>';
+        else if (b === 'bestseller') badgeHTML += '<span class="badge badge-bestseller">Bestseller</span>';
+      });
+      badgeHTML += '</div>';
+    }
+    
+    card.innerHTML = `
+      <div class="product-card__img-wrap">
+        <img src="${p.image}" alt="${p.name}" loading="lazy">
+        ${badgeHTML}
+        <button class="product-card__wish" aria-label="Wishlist" onclick="event.stopPropagation(); toggleWish(this)">
+          <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        </button>
+        <div class="product-card__overlay">
+          <div class="product-card__quick">
+            <button onclick="event.stopPropagation(); addToCart('${p.name}', ${p.price})">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+      <div class="product-card__info">
+        <div class="product-card__house">${p.house}</div>
+        <div class="product-card__name">${p.name}</div>
+        <div class="product-card__accord">${p.accord_desc}</div>
+        <div class="product-card__price-row">
+          <span class="product-card__price">$${p.price}</span>
+        </div>
+      </div>
+    `;
+    
+    fragment.appendChild(card);
+  }
+  
+  grid.innerHTML = '';
+  grid.appendChild(fragment);
+  
+  document.getElementById('visible-count').textContent = Math.min(displayedCount, PRODUCTS.length);
+  document.querySelector('.page-header-sub').textContent = `${PRODUCTS.length} fragrances. A decade of work. Each one made in batches of 5,000 or fewer.`;
+  
+  if (displayedCount >= PRODUCTS.length) {
+    document.getElementById('load-more-btn').style.display = 'none';
+  }
+}
+
+function loadMore() {
+  displayedCount += productsPerLoad;
+  renderProducts();
+  window.scrollTo({ top: document.getElementById('product-grid').offsetTop - 100, behavior: 'smooth' });
+}
+
+renderProducts();
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2800);
+
+
+// Fade in
+const obs = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } }), { threshold: 0.06 });
+document.querySelectorAll('.fade-up').forEach(el => obs.observe(el));
+
+updateCartCount();
+</script>
+</body>
+</html>
